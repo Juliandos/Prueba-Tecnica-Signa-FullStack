@@ -1,5 +1,5 @@
 'use client';
-
+import toast from "react-hot-toast";
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 
@@ -30,15 +30,16 @@ export default function LoginForm() {
             const data = await response.json();
 
             if (!response.ok) {
-                throw new Error(data.detail || 'Login failed');
+                throw new Error(data.detail || 'Login fallido ❌');
             }
 
             // Guardar token en localStorage
             localStorage.setItem('token', data.access_token);
-
+            toast.success("¡Bienvenido! 🎉");
             // Redirigir
             router.push('/marcas');
         } catch (err) {
+            toast.error(err instanceof Error ? err.message : 'Error en login');
             setError(err instanceof Error ? err.message : 'Login failed');
         } finally {
             setLoading(false);

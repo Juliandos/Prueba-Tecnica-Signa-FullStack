@@ -1,5 +1,5 @@
 'use client';
-
+import toast from "react-hot-toast";
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 
@@ -30,10 +30,10 @@ export default function RegistroForm() {
             if (!response.ok) {
                 throw new Error(data.detail || 'Registro fallido');
             }
-
-            // Opcional: redirigir automáticamente al login después de registrarse
+            toast.success("¡Usuario registrado con éxito! 🎉");
             router.push('/auth/login');
         } catch (err) {
+            toast.error(err instanceof Error ? err.message : 'Error en registro');
             setError(err instanceof Error ? err.message : 'Registro fallido');
         } finally {
             setLoading(false);
