@@ -37,7 +37,7 @@ export default function LoginForm() {
             localStorage.setItem('token', data.access_token);
 
             // Redirigir
-            router.push('/order/hamburgesa');
+            router.push('/marcas');
         } catch (err) {
             setError(err instanceof Error ? err.message : 'Login failed');
         } finally {
@@ -48,6 +48,7 @@ export default function LoginForm() {
     return (
         <form onSubmit={handleSubmit} className="space-y-4">
             {error && <div className="text-red-500">{error}</div>}
+            
             <div>
                 <label htmlFor="email" className="block mb-1">Email</label>
                 <input
@@ -59,6 +60,7 @@ export default function LoginForm() {
                     required
                 />
             </div>
+
             <div>
                 <label htmlFor="password" className="block mb-1">Password</label>
                 <input
@@ -70,12 +72,22 @@ export default function LoginForm() {
                     required
                 />
             </div>
+
             <button
                 type="submit"
                 disabled={loading}
                 className="w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-600 disabled:bg-blue-300"
             >
                 {loading ? 'Logging in...' : 'Login'}
+            </button>
+
+            {/* Botón para ir a registro */}
+            <button
+                type="button"
+                onClick={() => router.push('/auth/registro')}
+                className="w-full bg-gray-500 text-white p-2 rounded hover:bg-gray-600"
+            >
+                Ir a Registro
             </button>
         </form>
     );

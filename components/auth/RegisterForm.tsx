@@ -3,8 +3,9 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 
-export default function LoginForm() {
-    const [email, setEmail] = useState('');
+export default function RegistroForm() {
+    const [nombre, setNombre] = useState('');
+    const [correo, setCorreo] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
@@ -16,46 +17,59 @@ export default function LoginForm() {
         setError('');
 
         try {
-            const response = await fetch('http://localhost:8000/auth/token2', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ email, password }),
+            const response = await fetch("http://localhost:8000/usuarios/registro", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+                body: JSON.stringify({ nombre, correo, password }),
             });
 
             const data = await response.json();
 
             if (!response.ok) {
-                throw new Error(data.detail || 'Login failed');
+                throw new Error(data.detail || 'Registro fallido');
             }
 
-            // Guardar token en localStorage
-            localStorage.setItem('token', data.access_token);
-
-            // Redirigir
-            router.push('/order/hamburgesa');
+            // Opcional: redirigir automáticamente al login después de registrarse
+            router.push('/auth/login');
         } catch (err) {
-            setError(err instanceof Error ? err.message : 'Login failed');
+            setError(err instanceof Error ? err.message : 'Registro fallido');
         } finally {
             setLoading(false);
         }
     };
 
     return (
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4 max-w-md mx-auto p-6 bg-white rounded shadow">
+            <h2 className="text-xl font-bold">Registro</h2>
+
             {error && <div className="text-red-500">{error}</div>}
+
             <div>
-                <label htmlFor="email" className="block mb-1">Email</label>
+                <label htmlFor="nombre" className="block mb-1">Nombre</label>
                 <input
-                    id="email"
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    id="nombre"
+                    type="text"
+                    value={nombre}
+                    onChange={(e) => setNombre(e.target.value)}
                     className="w-full p-2 border rounded"
                     required
                 />
             </div>
+
+            <div>
+                <label htmlFor="correo" className="block mb-1">Correo</label>
+                <input
+                    id="correo"
+                    type="email"
+                    value={correo}
+                    onChange={(e) => setCorreo(e.target.value)}
+                    className="w-full p-2 border rounded"
+                    required
+                />
+            </div>
+
             <div>
                 <label htmlFor="password" className="block mb-1">Password</label>
                 <input
@@ -67,12 +81,22 @@ export default function LoginForm() {
                     required
                 />
             </div>
+
             <button
                 type="submit"
                 disabled={loading}
-                className="w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-600 disabled:bg-blue-300"
+                className="w-full bg-green-500 text-white p-2 rounded hover:bg-green-600 disabled:bg-green-300"
             >
-                {loading ? 'Logging in...' : 'Login'}
+                {loading ? 'Registrando...' : 'Registrarse'}
+            </button>
+
+            {/* Botón para regresar a login */}
+            <button
+                type="button"
+                onClick={() => router.push('/login')}
+                className="w-full bg-gray-500 text-white p-2 rounded hover:bg-gray-600"
+            >
+                Volver a Login
             </button>
         </form>
     );
