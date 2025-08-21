@@ -3,8 +3,10 @@
 import React, { useEffect, useState } from "react";
 import DataTable from "react-data-table-component";
 import { Pencil, Trash2, Plus } from "lucide-react";
-import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
+import CrearMarcaModal from "../../components/marca/CrearMarcaModal";
+import ActualizarMarcaModal from "../../components/marca/ActualizarMarcaModal";
+import BorrarMarcaModal from "../../components/marca/BorrarMarcaModal";
 
 interface Marca {
   id: number;
@@ -13,12 +15,29 @@ interface Marca {
   estado: boolean;
   created_at: string;
   updated_at: string;
+  usuarios_id: number; // relación con usuario
+}
+
+interface Usuario {
+  id: number;
+  nombre: string;
+  correo: string;
 }
 
 export default function MarcasPage() {
   const [marcas, setMarcas] = useState<Marca[]>([]);
+  const [usuarios, setUsuarios] = useState<Usuario[]>([]);
   const [loading, setLoading] = useState(false);
-  const router = useRouter();
+
+  const [showCrear, setShowCrear] = useState(false);
+  const [showEditar, setShowEditar] = useState<Marca | null>(null);
+  const [showBorrar, setShowBorrar] = useState<number | null>(null);
+
+  // 🔹 Diccionario de usuarios (id → nombre)
+  const userMap: Record<number, string> = usuarios.reduce(
+    (acc, u) => ({ ...acc, [u.id]: u.nombre }),
+    {}
+  );
 
   // Cargar marcas
   const fetchMarcas = async () => {
@@ -26,9 +45,7 @@ export default function MarcasPage() {
       setLoading(true);
       const token = localStorage.getItem("token");
       const res = await fetch("http://localhost:8000/marcas/", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { Authorization: `Bearer ${token}` },
       });
 
       if (!res.ok) throw new Error("Error cargando marcas");
@@ -41,21 +58,17 @@ export default function MarcasPage() {
     }
   };
 
-  // Borrar marca
-  const handleDelete = async (id: number) => {
-    if (!confirm("¿Seguro que quieres eliminar esta marca?")) return;
+  // Cargar usuarios
+  const fetchUsuarios = async () => {
     try {
       const token = localStorage.getItem("token");
-      const res = await fetch(`http://localhost:8000/marcas/${id}`, {
-        method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+      const res = await fetch("http://localhost:8000/usuarios/", {
+        headers: { Authorization: `Bearer ${token}` },
       });
 
-      if (!res.ok) throw new Error("Error eliminando marca");
-      toast.success("Marca eliminada");
-      fetchMarcas();
+      if (!res.ok) throw new Error("Error cargando usuarios");
+      const data = await res.json();
+      setUsuarios(data);
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Error desconocido");
     }
@@ -63,29 +76,17 @@ export default function MarcasPage() {
 
   useEffect(() => {
     fetchMarcas();
+    fetchUsuarios();
   }, []);
 
-  // Columnas de la tabla
   const columns = [
+    { name: "ID", selector: (row: Marca) => row.id, sortable: true, width: "70px" },
+    { name: "Nombre", selector: (row: Marca) => row.nombre, sortable: true },
+    { name: "Titular", selector: (row: Marca) => row.titular, sortable: true },
+    { name: "Estado", selector: (row: Marca) => (row.estado ? "Activo" : "Inactivo") },
     {
-      name: "ID",
-      selector: (row: Marca) => row.id,
-      sortable: true,
-      width: "70px",
-    },
-    {
-      name: "Nombre",
-      selector: (row: Marca) => row.nombre,
-      sortable: true,
-    },
-    {
-      name: "Titular",
-      selector: (row: Marca) => row.titular,
-      sortable: true,
-    },
-    {
-      name: "Estado",
-      selector: (row: Marca) => (row.estado ? "Activo" : "Inactivo"),
+      name: "Usuario",
+      selector: (row: Marca) => userMap[row.usuarios_id] || "Desconocido",
       sortable: true,
     },
     {
@@ -93,13 +94,13 @@ export default function MarcasPage() {
       cell: (row: Marca) => (
         <div className="flex gap-2">
           <button
-            onClick={() => router.push(`/marcas/${row.id}/editar`)}
+            onClick={() => setShowEditar(row)}
             className="p-2 bg-blue-500 text-white rounded hover:bg-blue-600"
           >
             <Pencil size={16} />
           </button>
           <button
-            onClick={() => handleDelete(row.id)}
+            onClick={() => setShowBorrar(row.id)}
             className="p-2 bg-red-500 text-white rounded hover:bg-red-600"
           >
             <Trash2 size={16} />
@@ -114,7 +115,7 @@ export default function MarcasPage() {
       <div className="flex justify-between items-center mb-4">
         <h1 className="text-2xl font-bold">Gestión de Marcas</h1>
         <button
-          onClick={() => router.push("/marcas/nueva")}
+          onClick={() => setShowCrear(true)}
           className="flex items-center gap-2 bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
         >
           <Plus size={18} /> Nueva Marca
@@ -129,6 +130,29 @@ export default function MarcasPage() {
         highlightOnHover
         striped
       />
+
+      {showCrear && (
+        <CrearMarcaModal
+          usuarios={usuarios} // 🔑 le pasamos usuarios al modal para elegir
+          onSuccess={fetchMarcas}
+          onClose={() => setShowCrear(false)}
+        />
+      )}
+      {showEditar && (
+        <ActualizarMarcaModal
+          marca={showEditar}
+          usuarios={usuarios} // 🔑 para actualizar también
+          onSuccess={fetchMarcas}
+          onClose={() => setShowEditar(null)}
+        />
+      )}
+      {showBorrar && (
+        <BorrarMarcaModal
+          id={showBorrar}
+          onSuccess={fetchMarcas}
+          onClose={() => setShowBorrar(null)}
+        />
+      )}
     </div>
   );
 }
