@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import { useRouter } from 'next/navigation'; 
 import DataTable from "react-data-table-component";
 import { Pencil, Trash2, Plus } from "lucide-react";
 import toast from "react-hot-toast";
@@ -32,6 +33,15 @@ export default function MarcasPage() {
   const [showCrear, setShowCrear] = useState(false);
   const [showEditar, setShowEditar] = useState<Marca | null>(null);
   const [showBorrar, setShowBorrar] = useState<number | null>(null);
+
+  const router = useRouter();
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      router.push("/auth/login");
+    }
+  }, [router]);
 
   // 🔹 Diccionario de usuarios (id → nombre)
   const userMap: Record<number, string> = usuarios.reduce(
