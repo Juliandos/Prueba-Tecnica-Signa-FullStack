@@ -2,6 +2,7 @@
 import toast from "react-hot-toast";
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useAuth } from "@/context/AuthContext";
 
 export default function LoginForm() {
     const [username, setEmail] = useState('');
@@ -9,6 +10,7 @@ export default function LoginForm() {
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
     const router = useRouter();
+    const { dispatch } = useAuth();
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -35,6 +37,9 @@ export default function LoginForm() {
 
             // Guardar token en localStorage
             localStorage.setItem('token', data.access_token);
+
+            // Dispatch al contexto
+            dispatch({ type: "LOGIN", payload: data.access_token });
             toast.success("¡Bienvenido! 🎉");
             // Redirigir
             router.push('/marcas');
