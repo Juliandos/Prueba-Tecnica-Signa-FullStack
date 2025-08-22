@@ -54,7 +54,7 @@ export default function MarcasPage() {
     try {
       setLoading(true);
       const token = localStorage.getItem("token");
-      const res = await fetch("http://localhost:8000/marcas/", {
+      const res = await fetch("http://localhost:8081/marcas/", {
         headers: { Authorization: `Bearer ${token}` },
       });
 
@@ -72,7 +72,7 @@ export default function MarcasPage() {
   const fetchUsuarios = async () => {
     try {
       const token = localStorage.getItem("token");
-      const res = await fetch("http://localhost:8000/usuarios/", {
+      const res = await fetch("http://localhost:8081/usuarios/", {
         headers: { Authorization: `Bearer ${token}` },
       });
 

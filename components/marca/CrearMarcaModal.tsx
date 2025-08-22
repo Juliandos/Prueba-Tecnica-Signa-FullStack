@@ -24,7 +24,7 @@ export default function CrearMarcaModal({ usuarios, onSuccess, onClose }: Props)
         e.preventDefault();
         try {
             const token = localStorage.getItem("token");
-            const res = await fetch("http://localhost:8000/marcas/", {
+            const res = await fetch("http://localhost:8081/marcas/", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",

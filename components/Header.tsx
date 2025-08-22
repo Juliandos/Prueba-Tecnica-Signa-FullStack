@@ -20,7 +20,7 @@ export default function Header() {
 
                 if (!token || !correo) return;
 
-                const res = await fetch("http://localhost:8000/usuarios", {
+                const res = await fetch("http://localhost:8081/usuarios", {
                     headers: {
                         Authorization: `Bearer ${token}`,
                     },

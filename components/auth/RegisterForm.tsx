@@ -17,7 +17,7 @@ export default function RegistroForm() {
         setError('');
 
         try {
-            const response = await fetch("http://localhost:8000/usuarios/registro", {
+            const response = await fetch("http://localhost:8081/usuarios/registro", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",

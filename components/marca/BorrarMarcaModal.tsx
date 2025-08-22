@@ -12,7 +12,7 @@ export default function BorrarMarcaModal({ id, onSuccess, onClose }: Props) {
     const handleDelete = async () => {
         try {
             const token = localStorage.getItem("token");
-            const res = await fetch(`http://localhost:8000/marcas/${id}`, {
+            const res = await fetch(`http://localhost:8081/marcas/${id}`, {
                 method: "DELETE",
                 headers: {
                     Authorization: `Bearer ${token}`,

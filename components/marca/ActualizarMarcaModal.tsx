@@ -33,7 +33,7 @@ export default function ActualizarMarcaModal({ marca, usuarios, onSuccess, onClo
         e.preventDefault();
         try {
             const token = localStorage.getItem("token");
-            const res = await fetch(`http://localhost:8000/marcas/${marca.id}`, {
+            const res = await fetch(`http://localhost:8081/marcas/${marca.id}`, {
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json",
