@@ -2,6 +2,7 @@
 import toast from "react-hot-toast";
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { API_URL } from "@/utils/api";
 
 export default function RegistroForm() {
     const [nombre, setNombre] = useState('');
@@ -17,7 +18,7 @@ export default function RegistroForm() {
         setError('');
 
         try {
-            const response = await fetch("http://localhost:8081/usuarios/registro", {
+            const response = await fetch(`${API_URL}/usuarios/registro`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",

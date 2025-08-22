@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { Menu, LogOut, User } from "lucide-react";
 import Link from "next/link";
+import { API_URL } from "@/utils/api";
 
 interface Usuario {
     id: number;
@@ -20,7 +21,7 @@ export default function Header() {
 
                 if (!token || !correo) return;
 
-                const res = await fetch("http://localhost:8081/usuarios", {
+                const res = await fetch(`${API_URL}/usuarios`, {
                     headers: {
                         Authorization: `Bearer ${token}`,
                     },

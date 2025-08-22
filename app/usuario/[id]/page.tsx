@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { User, Mail, Phone } from "lucide-react";
+import { API_URL } from "@/utils/api";
 
 type Usuario = {
     id: number;
@@ -25,7 +26,7 @@ export default function UsuarioPage() {
         }
 
         if (id) {
-            fetch(`http://localhost:8081/usuarios/${id}`, {
+            fetch(`${API_URL}/usuarios/${id}`, {
                 headers: {
                     "Content-Type": "application/json",
                     Authorization: `Bearer ${token}`, // 🔑 Token en header

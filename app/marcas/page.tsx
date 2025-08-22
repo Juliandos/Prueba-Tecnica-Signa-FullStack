@@ -8,6 +8,7 @@ import toast from "react-hot-toast";
 import CrearMarcaModal from "../../components/marca/CrearMarcaModal";
 import ActualizarMarcaModal from "../../components/marca/ActualizarMarcaModal";
 import BorrarMarcaModal from "../../components/marca/BorrarMarcaModal";
+import { API_URL } from "@/utils/api";
 
 interface Marca {
   id: number;
@@ -54,7 +55,7 @@ export default function MarcasPage() {
     try {
       setLoading(true);
       const token = localStorage.getItem("token");
-      const res = await fetch("http://localhost:8081/marcas/", {
+      const res = await fetch(`${API_URL}/marcas`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
@@ -72,7 +73,7 @@ export default function MarcasPage() {
   const fetchUsuarios = async () => {
     try {
       const token = localStorage.getItem("token");
-      const res = await fetch("http://localhost:8081/usuarios/", {
+      const res = await fetch(`${API_URL}/usuarios`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 

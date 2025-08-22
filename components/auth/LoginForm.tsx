@@ -4,6 +4,8 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from "@/context/AuthContext";
 
+import { API_URL } from "@/utils/api";
+
 export default function LoginForm() {
     const [username, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -18,7 +20,7 @@ export default function LoginForm() {
         setError('');
 
         try {
-            const response = await fetch("http://localhost:8081/auth/token", {
+            const response = await fetch(`${API_URL}/auth/token`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/x-www-form-urlencoded",

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import toast from "react-hot-toast";
+import { API_URL } from "@/utils/api";
 
 interface Marca {
     id: number;
@@ -33,13 +34,18 @@ export default function ActualizarMarcaModal({ marca, usuarios, onSuccess, onClo
         e.preventDefault();
         try {
             const token = localStorage.getItem("token");
-            const res = await fetch(`http://localhost:8081/marcas/${marca.id}`, {
+            const res = await fetch(`${API_URL}/marcas/${marca.id}`, {
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json",
                     Authorization: `Bearer ${token}`,
                 },
-                body: JSON.stringify({ nombre, titular, estado, usuarios_id: usuariosId }),
+                body: JSON.stringify({
+                    nombre,
+                    titular,
+                    estado,
+                    usuarios_id: usuariosId,
+                }),
             });
 
             if (!res.ok) throw new Error("Error actualizando la marca");

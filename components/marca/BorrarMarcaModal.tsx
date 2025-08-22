@@ -1,6 +1,7 @@
 "use client";
 
 import toast from "react-hot-toast";
+import { API_URL } from "@/utils/api";
 
 interface Props {
     id: number;
@@ -12,7 +13,7 @@ export default function BorrarMarcaModal({ id, onSuccess, onClose }: Props) {
     const handleDelete = async () => {
         try {
             const token = localStorage.getItem("token");
-            const res = await fetch(`http://localhost:8081/marcas/${id}`, {
+            const res = await fetch(`${API_URL}/marcas/${id}`, {
                 method: "DELETE",
                 headers: {
                     Authorization: `Bearer ${token}`,

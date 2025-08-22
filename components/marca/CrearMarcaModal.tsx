@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import toast from "react-hot-toast";
+import { API_URL } from "@/utils/api";
 
 interface Usuario {
     id: number;
@@ -24,7 +25,7 @@ export default function CrearMarcaModal({ usuarios, onSuccess, onClose }: Props)
         e.preventDefault();
         try {
             const token = localStorage.getItem("token");
-            const res = await fetch("http://localhost:8081/marcas/", {
+            const res = await fetch(`${API_URL}/marcas`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
