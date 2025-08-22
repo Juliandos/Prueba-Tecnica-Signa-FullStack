@@ -18,10 +18,10 @@ export default function LoginForm() {
         setError('');
 
         try {
-            const response = await fetch('http://localhost:8000/auth/token', {
-                method: 'POST',
+            const response = await fetch("http://localhost:8000/auth/token", {
+                method: "POST",
                 headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
+                    "Content-Type": "application/x-www-form-urlencoded",
                 },
                 body: new URLSearchParams({
                     username: username,
@@ -32,17 +32,20 @@ export default function LoginForm() {
             const data = await response.json();
 
             if (!response.ok) {
-                throw new Error(data.detail || 'Login fallido ❌');
+                throw new Error(data.detail || "Login fallido ❌");
             }
 
             // Guardar token en localStorage
-            localStorage.setItem('token', data.access_token);
+            localStorage.setItem("token", data.access_token);
+
+            // Guardar correo en localStorage
+            localStorage.setItem("correo", data.correo);
 
             // Dispatch al contexto
             dispatch({ type: "LOGIN", payload: data.access_token });
             toast.success("¡Bienvenido! 🎉");
             // Redirigir
-            router.push('/marcas');
+            router.push("/marcas");
         } catch (err) {
             toast.error(err instanceof Error ? err.message : 'Error en login');
             setError(err instanceof Error ? err.message : 'Login failed');
@@ -54,7 +57,7 @@ export default function LoginForm() {
     return (
         <form onSubmit={handleSubmit} className="space-y-4">
             {error && <div className="text-red-500">{error}</div>}
-            
+
             <div>
                 <label htmlFor="email" className="block mb-1">Email</label>
                 <input

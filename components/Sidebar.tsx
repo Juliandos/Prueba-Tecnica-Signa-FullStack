@@ -12,12 +12,6 @@ export default function Sidebar() {
         <Link href="/marcas" className="block p-2 rounded hover:bg-gray-100">
           Marcas
         </Link>
-        <Link href="/marcas/nueva" className="block p-2 rounded hover:bg-gray-100">
-          Nueva Marca
-        </Link>
-        <Link href="/configuracion" className="block p-2 rounded hover:bg-gray-100">
-          Configuración
-        </Link>
       </nav>
     </aside>
   );
