@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import toast from "react-hot-toast";
+import { toast } from "react-toastify";
 import { API_URL } from "@/utils/api";
 
 interface Marca {

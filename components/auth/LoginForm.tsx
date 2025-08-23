@@ -44,8 +44,8 @@ export default function LoginForm() {
             localStorage.setItem("correo", data.correo);
 
             // Dispatch al contexto
-            dispatch({ type: "LOGIN", payload: data.access_token });
             toast.success("¡Bienvenido! 🎉");
+            dispatch({ type: "LOGIN", payload: data.access_token });
             // Redirigir
             router.push("/marcas");
         } catch (err) {

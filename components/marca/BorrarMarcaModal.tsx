@@ -1,6 +1,6 @@
 "use client";
 
-import toast from "react-hot-toast";
+import { toast } from "react-toastify";
 import { API_URL } from "@/utils/api";
 
 interface Props {

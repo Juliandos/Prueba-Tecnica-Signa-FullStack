@@ -1,8 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import toast from "react-hot-toast";
+import { toast } from "react-toastify";
 import { API_URL } from "@/utils/api";
+
 
 interface Usuario {
     id: number;
@@ -36,7 +37,7 @@ export default function CrearMarcaModal({ usuarios, onSuccess, onClose }: Props)
 
             if (!res.ok) throw new Error("Error creando la marca");
 
-            toast.success("Marca creada con éxito");
+            toast.success("Guardado con éxito!");
             onSuccess();
             onClose();
         } catch (err) {
