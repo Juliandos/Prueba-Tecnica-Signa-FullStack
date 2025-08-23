@@ -33,7 +33,8 @@ export default function Header() {
 
                 const data: Usuario[] = await res.json();
                 const user = data.find((u) => u.correo === correo);
-
+                console.log("Prueba");
+                
                 if (user) setUsuario(user);
             } catch (error) {
                 console.error(error);
