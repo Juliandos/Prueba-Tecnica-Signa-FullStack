@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useReducer, useEffect } from "react";
+import { createContext, useContext, useReducer, useEffect, useRef } from "react";
 import { jwtDecode } from "jwt-decode";
 import { useRouter } from "next/navigation";
 
@@ -30,8 +30,8 @@ interface JwtPayload {
 const AuthContext = createContext<{
     state: AuthState;
     dispatch: React.Dispatch<AuthAction>;
-    logoutNow: () => void;   // 👈 función manual expuesta
-}>({
+    logoutNow: () => void;
+}>( {
     state: { token: null, user: null },
     dispatch: () => {},
     logoutNow: () => {},
@@ -55,20 +55,30 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const [state, dispatch] = useReducer(authReducer, { token: null, user: null });
     const router = useRouter();
 
+    // ref para guardar el timeout actual
+    const logoutTimer = useRef<NodeJS.Timeout | null>(null);
+
     // 🔹 logout inmediato e independiente
     const logoutNow = () => {
+        // limpiar cualquier timer pendiente
+        if (logoutTimer.current) {
+            clearTimeout(logoutTimer.current);
+            logoutTimer.current = null;
+        }
+
         dispatch({ type: "LOGOUT" });
         localStorage.removeItem("token");
         localStorage.removeItem("correo");
-        console.log("se supone que borró");
-        
+        console.log("✅ Sesión cerrada manualmente");
+
         router.push("/auth/login");
     };
 
     // 🔹 programar logout automático por expiración
     const programLogout = (ms: number) => {
-        setTimeout(() => {
-            logoutNow(); // usa la misma lógica, pero disparado por el timer
+        if (logoutTimer.current) clearTimeout(logoutTimer.current);
+        logoutTimer.current = setTimeout(() => {
+            logoutNow(); // dispara el mismo logout, pero automático
         }, ms);
     };
 
