@@ -13,6 +13,7 @@ export default function Sidebar() {
         <h1 className="text-xl font-bold text-blue-600">Signa FullStack</h1>
       </div>
 
+
       <nav className="flex-1 p-4 space-y-3">
         <Link href="/marcas" className="block p-2 rounded hover:bg-gray-100">
           Marcas
