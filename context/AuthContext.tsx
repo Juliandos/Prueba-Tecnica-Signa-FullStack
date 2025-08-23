@@ -8,8 +8,8 @@ interface Usuario {
     id: number;
     nombre: string;
     correo: string;
-    password: string; // 👈 en frontend normalmente no se expone, solo se envía en registro/login
-    created_at: string;  // formato ISO (ej: "2025-08-22T12:34:56Z")
+    password: string;
+    created_at: string;
     updated_at: string;
 }
 
@@ -19,7 +19,7 @@ interface AuthState {
 }
 
 type AuthAction =
-    | { type: "LOGIN"; payload: string } // payload = token
+    | { type: "LOGIN"; payload: string }
     | { type: "LOGOUT" };
 
 interface JwtPayload {
@@ -30,9 +30,11 @@ interface JwtPayload {
 const AuthContext = createContext<{
     state: AuthState;
     dispatch: React.Dispatch<AuthAction>;
+    logoutNow: () => void;   // 👈 añadimos función manual
 }>({
     state: { token: null, user: null },
     dispatch: () => { },
+    logoutNow: () => { },
 });
 
 function authReducer(state: AuthState, action: AuthAction): AuthState {
@@ -69,13 +71,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     const programLogout = (ms: number) => {
         setTimeout(() => {
-            dispatch({ type: "LOGOUT" });
-            localStorage.removeItem("token");
-            router.push("/auth/login");
+            logoutNow();
         }, ms);
     };
 
-    // Programar logout cuando hay un token
+    // 👇 función manual para logout inmediato
+    const logoutNow = () => {
+        dispatch({ type: "LOGOUT" });
+        localStorage.removeItem("token");
+        localStorage.removeItem("correo");
+        router.push("/auth/login");
+    };
+
+    // Programar logout por expiración
     useEffect(() => {
         if (state.token) {
             const decoded = jwtDecode<JwtPayload>(state.token);
@@ -85,7 +93,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }, [state.token]);
 
     return (
-        <AuthContext.Provider value={{ state, dispatch }}>
+        <AuthContext.Provider value={{ state, dispatch, logoutNow }}>
             {children}
         </AuthContext.Provider>
     );

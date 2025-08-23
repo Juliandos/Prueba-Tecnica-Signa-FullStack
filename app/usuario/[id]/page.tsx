@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
-import Link from "next/link"; // 👈 importamos Link
+import Link from "next/link";
 import { User, Mail } from "lucide-react";
 import { API_URL } from "@/utils/api";
 
