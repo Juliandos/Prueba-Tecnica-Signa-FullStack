@@ -3,14 +3,15 @@
 import { createContext, useContext, useReducer, useEffect, useRef } from "react";
 import { jwtDecode } from "jwt-decode";
 import { useRouter } from "next/navigation";
+import { API_URL } from "@/utils/api";
 
 interface Usuario {
     id: number;
     nombre: string;
     correo: string;
-    password: string;
-    created_at: string;
-    updated_at: string;
+    password?: string;
+    created_at?: string;
+    updated_at?: string;
 }
 
 interface AuthState {
@@ -19,7 +20,7 @@ interface AuthState {
 }
 
 type AuthAction =
-    | { type: "LOGIN"; payload: string }
+    | { type: "LOGIN"; payload: { token: string; user: Usuario } }
     | { type: "LOGOUT" };
 
 interface JwtPayload {
@@ -39,11 +40,8 @@ const AuthContext = createContext<{
 
 function authReducer(state: AuthState, action: AuthAction): AuthState {
     switch (action.type) {
-        case "LOGIN": {
-            const token = action.payload;
-            const decoded = jwtDecode<JwtPayload>(token);
-            return { token, user: { id: Number(decoded.sub) } as Usuario };
-        }
+        case "LOGIN":
+            return { token: action.payload.token, user: action.payload.user };
         case "LOGOUT":
             return { token: null, user: null };
         default:
@@ -54,55 +52,59 @@ function authReducer(state: AuthState, action: AuthAction): AuthState {
 export function AuthProvider({ children }: { children: React.ReactNode }) {
     const [state, dispatch] = useReducer(authReducer, { token: null, user: null });
     const router = useRouter();
-
-    // ref para guardar el timeout actual
     const logoutTimer = useRef<NodeJS.Timeout | null>(null);
 
-    // 🔹 logout inmediato e independiente
     const logoutNow = () => {
-        // limpiar cualquier timer pendiente
-        if (logoutTimer.current) {
-            clearTimeout(logoutTimer.current);
-            logoutTimer.current = null;
-        }
+        if (logoutTimer.current) clearTimeout(logoutTimer.current);
 
         dispatch({ type: "LOGOUT" });
         localStorage.removeItem("token");
         localStorage.removeItem("correo");
-
         router.push("/auth/login");
     };
 
-    // 🔹 programar logout automático por expiración
     const programLogout = (ms: number) => {
         if (logoutTimer.current) clearTimeout(logoutTimer.current);
-        logoutTimer.current = setTimeout(() => {
-            logoutNow(); // dispara el mismo logout, pero automático
-        }, ms);
+        logoutTimer.current = setTimeout(() => logoutNow(), ms);
     };
 
-    // 🔹 restaurar sesión desde localStorage al cargar la app
     useEffect(() => {
-        const token = localStorage.getItem("token");
-        if (token) {
-            const decoded = jwtDecode<JwtPayload>(token);
-            if (Date.now() < decoded.exp * 1000) {
-                dispatch({ type: "LOGIN", payload: token });
-                programLogout(decoded.exp * 1000 - Date.now());
-            } else {
-                localStorage.removeItem("token");
-            }
-        }
-    }, []);
+        const initAuth = async () => {
+            const token = localStorage.getItem("token");
+            const correo = localStorage.getItem("correo");
 
-    // 🔹 cada vez que cambia el token, verificamos expiración
-    useEffect(() => {
-        if (state.token) {
-            const decoded = jwtDecode<JwtPayload>(state.token);
-            const ms = decoded.exp * 1000 - Date.now();
-            if (ms > 0) programLogout(ms);
-        }
-    }, [state.token]);
+            if (!token || !correo) return;
+
+            const decoded = jwtDecode<JwtPayload>(token);
+            if (Date.now() >= decoded.exp * 1000) {
+                logoutNow();
+                return;
+            }
+
+            try {
+                const res = await fetch(`${API_URL}/usuarios`, {
+                    headers: { Authorization: `Bearer ${token}` },
+                });
+
+                if (!res.ok) throw new Error("Error obteniendo usuarios");
+
+                const usuarios: Usuario[] = await res.json();
+                const user = usuarios.find((u) => u.correo === correo);
+
+                if (user) {
+                    dispatch({ type: "LOGIN", payload: { token, user } });
+                    programLogout(decoded.exp * 1000 - Date.now());
+                } else {
+                    logoutNow();
+                }
+            } catch (error) {
+                console.error(error);
+                logoutNow();
+            }
+        };
+
+        initAuth();
+    }, []);
 
     return (
         <AuthContext.Provider value={{ state, dispatch, logoutNow }}>

@@ -14,9 +14,9 @@ interface LayoutProps {
 export default function Layout({ children }: LayoutProps) {
     return (
         <div className="flex h-screen bg-gray-100">
-            <Sidebar />
+            <AuthProvider>
+                <Sidebar />
             <div className="flex flex-col flex-1">
-                <AuthProvider>
                     <Header />
                     <main className="flex-1 p-6 overflow-y-auto">{children}</main>
                     {/* 👇 contenedor global de Toastify */}
@@ -29,8 +29,8 @@ export default function Layout({ children }: LayoutProps) {
                         pauseOnHover
                         draggable
                     />
-                </AuthProvider>
             </div>
+            </AuthProvider>
         </div>
     );
 }
