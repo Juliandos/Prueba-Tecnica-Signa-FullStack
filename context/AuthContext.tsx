@@ -30,11 +30,11 @@ interface JwtPayload {
 const AuthContext = createContext<{
     state: AuthState;
     dispatch: React.Dispatch<AuthAction>;
-    logoutNow: () => void;   // 👈 añadimos función manual
+    logoutNow: () => void;   // 👈 función manual expuesta
 }>({
     state: { token: null, user: null },
-    dispatch: () => { },
-    logoutNow: () => { },
+    dispatch: () => {},
+    logoutNow: () => {},
 });
 
 function authReducer(state: AuthState, action: AuthAction): AuthState {
@@ -55,7 +55,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const [state, dispatch] = useReducer(authReducer, { token: null, user: null });
     const router = useRouter();
 
-    // Restaurar sesión desde localStorage
+    // 🔹 logout inmediato e independiente
+    const logoutNow = () => {
+        dispatch({ type: "LOGOUT" });
+        localStorage.removeItem("token");
+        localStorage.removeItem("correo");
+        router.push("/auth/login");
+    };
+
+    // 🔹 programar logout automático por expiración
+    const programLogout = (ms: number) => {
+        setTimeout(() => {
+            logoutNow(); // usa la misma lógica, pero disparado por el timer
+        }, ms);
+    };
+
+    // 🔹 restaurar sesión desde localStorage al cargar la app
     useEffect(() => {
         const token = localStorage.getItem("token");
         if (token) {
@@ -69,21 +84,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         }
     }, []);
 
-    const programLogout = (ms: number) => {
-        setTimeout(() => {
-            logoutNow();
-        }, ms);
-    };
-
-    // 👇 función manual para logout inmediato
-    const logoutNow = () => {
-        dispatch({ type: "LOGOUT" });
-        localStorage.removeItem("token");
-        localStorage.removeItem("correo");
-        router.push("/auth/login");
-    };
-
-    // Programar logout por expiración
+    // 🔹 cada vez que cambia el token, verificamos expiración
     useEffect(() => {
         if (state.token) {
             const decoded = jwtDecode<JwtPayload>(state.token);
