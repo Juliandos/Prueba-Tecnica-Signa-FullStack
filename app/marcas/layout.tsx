@@ -13,8 +13,8 @@ export default function Layout({ children }: LayoutProps) {
         <div className="flex h-screen bg-gray-100">
             <Sidebar />
             <div className="flex flex-col flex-1">
-                <Header />
                 <AuthProvider>
+                    <Header />
                     <main className="flex-1 p-6 overflow-y-auto">{children}</main>
                 </AuthProvider>
             </div>

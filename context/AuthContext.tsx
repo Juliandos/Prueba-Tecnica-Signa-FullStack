@@ -69,7 +69,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         dispatch({ type: "LOGOUT" });
         localStorage.removeItem("token");
         localStorage.removeItem("correo");
-        console.log("✅ Sesión cerrada manualmente");
 
         router.push("/auth/login");
     };
