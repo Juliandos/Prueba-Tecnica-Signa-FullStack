@@ -60,6 +60,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         dispatch({ type: "LOGOUT" });
         localStorage.removeItem("token");
         localStorage.removeItem("correo");
+        console.log("se supone que borró");
+        
         router.push("/auth/login");
     };
 
